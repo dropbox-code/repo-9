@@ -23,6 +23,23 @@ describe NetSuite::Records::SalesOrder do
     end
   end
 
+  it 'has all the right fields with specific classes' do
+    {
+      billing_address: NetSuite::Records::Address,
+      custom_field_list: NetSuite::Records::CustomFieldList,
+      gift_cert_redemption_list: NetSuite::Records::GiftCertRedemptionList,
+      item_list: NetSuite::Records::SalesOrderItemList,
+      null_field_list: NetSuite::Records::NullFieldList,
+      promotions_list: NetSuite::Records::PromotionsList,
+      ship_group_list: NetSuite::Records::SalesOrderShipGroupList,
+      shipping_address: NetSuite::Records::Address,
+      transaction_bill_address: NetSuite::Records::BillAddress,
+      transaction_ship_address: NetSuite::Records::ShipAddress,
+    }.each do |field, klass|
+      expect(salesorder).to have_field(field, klass)
+    end
+  end
+
   it 'has all the right record refs' do
     [
       :account, :bill_address_list, :created_from, :currency, :custom_form, :department, :discount_item,
@@ -170,6 +187,35 @@ describe NetSuite::Records::SalesOrder do
             with([salesorder], {}).
             and_return(response)
         expect(salesorder.add).to be_falsey
+      end
+    end
+  end
+
+  describe '#attach_file' do
+    let(:test_data) { { :email => 'test@example.com', :fax => '1234567890' } }
+    let(:file) { double('file') }
+
+    context 'when the response is successful' do
+      let(:response) { NetSuite::Response.new(:success => true, :body => { :internal_id => '1' }) }
+
+      it 'returns true' do
+        sales_order = NetSuite::Records::SalesOrder.new(test_data)
+        expect(NetSuite::Actions::AttachFile).to receive(:call).
+          with([sales_order, file], {}).
+          and_return(response)
+        expect(sales_order.attach_file(file)).to be_truthy
+      end
+    end
+
+    context 'when the response is unsuccessful' do
+      let(:response) { NetSuite::Response.new(:success => false, :body => {}) }
+
+      it 'returns false' do
+        sales_order = NetSuite::Records::SalesOrder.new(test_data)
+        expect(NetSuite::Actions::AttachFile).to receive(:call).
+          with([sales_order, file], {}).
+          and_return(response)
+        expect(sales_order.attach_file(file)).to be_falsey
       end
     end
   end

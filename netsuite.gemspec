@@ -2,8 +2,9 @@
 require File.expand_path('../lib/netsuite/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ['Ryan Moran', 'Michael Bianco']
-  gem.email         = ['ryan.moran@gmail.com', 'mike@cliffsidemedia.com']
+  gem.licenses      = ['MIT']
+  gem.authors       = ['Ryan Moran', 'Michael Bianco', 'Chris Gunther']
+  gem.email         = ['ryan.moran@gmail.com', 'mike@mikebian.co', 'chris@room118solutions.com']
   gem.description   = %q{NetSuite SuiteTalk API Wrapper}
   gem.summary       = %q{NetSuite SuiteTalk API (SOAP) Wrapper}
   gem.homepage      = 'https://github.com/NetSweet/netsuite'
@@ -14,8 +15,13 @@ Gem::Specification.new do |gem|
   gem.name          = 'netsuite'
   gem.require_paths = ['lib']
   gem.version       = NetSuite::VERSION
+  gem.required_ruby_version = '>= 2.1'
+  gem.metadata['changelog_uri'] = 'https://github.com/netsweet/netsuite/blob/master/HISTORY.md'
+  gem.metadata['mailing_list_uri'] = 'http://opensuite-slackin.herokuapp.com'
+  gem.metadata['rubygems_mfa_required'] = 'true'
 
-  gem.add_dependency 'savon', '>= 2.3.0'
+  gem.add_dependency 'savon', '>= 2.3.0', '!= 2.13.0'
 
-  gem.add_development_dependency 'rspec', '~> 3.8.0'
+  gem.add_development_dependency 'rspec', '~> 3.12.0'
+  gem.add_development_dependency 'rake', '~> 12.3.3'
 end

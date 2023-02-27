@@ -7,7 +7,7 @@ module NetSuite
       include Support::Actions
       include Namespaces::ListAcct
 
-      actions :get, :get_list, :add, :delete, :search, :update, :upsert
+      actions :get, :get_deleted, :get_list, :add, :delete, :search, :update, :update_list, :upsert
 
       fields :alternate_demand_source_item,
         :asset_account,
@@ -61,7 +61,6 @@ module NetSuite
         :hazmat_packing_group,
         :hazmat_shipping_name,
         :include_children,
-        :income_account,
         :interco_cogs_account,
         :interco_income_account,
         :invt_classification,
@@ -181,7 +180,6 @@ module NetSuite
         :store_display_name,
         :store_display_thumbnail,
         :store_item_template,
-        :subsidiary_list,
         :supply_lot_sizing_method,
         :supply_replenishment_method,
         :supply_time_fence,
@@ -209,6 +207,8 @@ module NetSuite
         :wip_acct,
         :wip_variance_acct
 
+      record_refs :income_account
+
       # accountingBookDetailList	ItemAccountingBookDetailList
       # binNumberList	InventoryItemBinNumberList
       # itemOptionsList	ItemOptionsList
@@ -220,6 +220,7 @@ module NetSuite
       # siteCategoryList	SiteCategoryList
       # translationsList	TranslationList
 
+      field :subsidiary_list, RecordRefList
       field :custom_field_list, CustomFieldList
 
       attr_reader :internal_id
