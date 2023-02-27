@@ -36,7 +36,7 @@ module NetSuite
       # This needs to be handled separately, since Savon will attempt to use
       # the configured proxy if one has been provided, regardless of whether
       # the value is empty/nil...
-      client_params[:proxy] = proxy if proxy.present?
+      client_params[:proxy] = proxy unless proxy.nil? || proxy.empty?
 
       client = Savon.client(client_params)
       cache_wsdl(client)
