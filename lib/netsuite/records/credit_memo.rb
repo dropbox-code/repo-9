@@ -17,12 +17,13 @@ module NetSuite
         :sales_effective_date, :shipping_cost, :shipping_tax1_rate, :shipping_tax2_rate, :source, :status,
         :sync_partner_teams, :sync_sales_teams, :tax2_total, :tax_rate, :to_be_emailed, :to_be_faxed,
         :to_be_printed, :total_cost_estimate, :tran_date, :tran_id, :tran_is_vsoe_bundle, :vat_reg_num,
-        :vsoe_auto_calc
+        :vsoe_auto_calc, :tax_details_override, :tax_reg_override
 
       field :custom_field_list,        CustomFieldList
       field :item_list,                CreditMemoItemList
       field :apply_list,               CreditMemoApplyList
       field :ship_group_list,          SalesOrderShipGroupList
+      field :null_field_list,          NullFieldList
 
       # field :bill_address_list,
       field :transaction_bill_address, BillAddress
@@ -38,7 +39,6 @@ module NetSuite
 
       attr_reader :internal_id
       attr_accessor :external_id
-      attr_accessor :search_joins
 
       def initialize(attributes = {})
         @internal_id = attributes.delete(:internal_id) || attributes.delete(:@internal_id)

@@ -21,6 +21,9 @@ module NetSuite
 
         def field(name, klass = nil)
           name_sym = name.to_sym
+          raise "#{name} already defined on #{self.name}" if fields.include?(name_sym)
+          raise "#{name} conflicts with a method defined on #{self.name}" if method_defined?(name_sym)
+
           fields << name_sym
           if klass
             define_method(name_sym) do
@@ -58,6 +61,22 @@ module NetSuite
         def read_only_field(name)
           name_sym = name.to_sym
           read_only_fields << name_sym
+          field name
+        end
+
+        def search_only_fields(*args)
+          if args.empty?
+             @search_only_fields ||= Set.new
+          else
+            args.each do |arg|
+              search_only_field arg
+            end
+          end
+        end
+
+        def search_only_field(name)
+          name_sym = name.to_sym
+          search_only_fields << name_sym
           field name
         end
       end

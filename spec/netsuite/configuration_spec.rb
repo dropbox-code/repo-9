@@ -14,6 +14,44 @@ describe NetSuite::Configuration do
       config.reset!
       expect(config.attributes).to be_empty
     end
+
+    it 'treats attributes as shared/global in default single tenant mode' do
+      config.attributes[:blah] = 'something'
+      expect(config.attributes[:blah]).to eq('something')
+
+      thread = Thread.new {
+        expect(config.attributes[:blah]).to eq('something')
+
+        config.attributes[:blah] = 'something_else'
+        expect(config.attributes[:blah]).to eq('something_else')
+      }
+
+      thread.join
+
+      expect(config.attributes[:blah]).to eq('something_else')
+    end
+
+    it 'treats attributes as thread-local in multi-tenant mode, which each thread starting with empty attributes' do
+      begin
+        config.multi_tenant!
+
+        config.attributes[:blah] = 'something'
+        expect(config.attributes[:blah]).to eq('something')
+
+        thread = Thread.new {
+          expect(config.attributes[:blah]).to be_nil
+
+          config.attributes[:blah] = 'something_else'
+          expect(config.attributes[:blah]).to eq('something_else')
+        }
+
+        thread.join
+
+        expect(config.attributes[:blah]).to eq('something')
+      ensure
+        config.instance_variable_set(:@multi_tenant, false)
+      end
+    end
   end
 
   describe '#filters' do
@@ -29,10 +67,12 @@ describe NetSuite::Configuration do
   end
 
   describe '#connection' do
+    EXAMPLE_ENDPOINT = 'https://1023.suitetalk.api.netsuite.com/services/NetSuitePort_2020_2'
     before(:each) do
       # reset clears out the password info
       config.email       'me@example.com'
       config.password    'me@example.com'
+      config.endpoint    EXAMPLE_ENDPOINT
       config.account     1023
       config.wsdl        "my_wsdl"
       config.api_version "2012_2"
@@ -57,6 +97,19 @@ describe NetSuite::Configuration do
 
       expect(config).to have_received(:cached_wsdl)
     end
+
+    it 'sets the endpoint on the Savon client' do
+      # this is ugly/brittle, but it's hard to see how else to test this
+      savon_configs = config.connection.globals.instance_eval {@options}
+      expect(savon_configs.fetch(:endpoint)).to eq(EXAMPLE_ENDPOINT)
+    end
+
+    it 'handles a nil endpoint' do
+      config.endpoint = nil
+      # this is ugly/brittle, but it's hard to see how else to test this
+      savon_configs = config.connection.globals.instance_eval {@options}
+      expect(savon_configs.fetch(:endpoint)).to eq(nil)
+    end
   end
 
   describe '#wsdl' do
@@ -72,7 +125,7 @@ describe NetSuite::Configuration do
 
     context 'when the wsdl has not been set' do
       it 'returns a path to the WSDL to use for the API' do
-        expect(config.wsdl).to eq("https://webservices.netsuite.com/wsdl/v2015_1_0/netsuite.wsdl")
+        expect(config.wsdl).to eq("https://webservices.netsuite.com/wsdl/v2016_2_0/netsuite.wsdl")
       end
     end
 
@@ -163,6 +216,23 @@ describe NetSuite::Configuration do
         expect(config.wsdl_cache).to be_empty
         expect( config.cached_wsdl ).to eq nil
       end
+    end
+  end
+
+  describe '#endpoint' do
+    it 'can be set with endpoint=' do
+      config.endpoint = 42
+      expect(config.endpoint).to eq(42)
+    end
+
+    it 'can be set with just endpoint(value)' do
+      config.endpoint(42)
+      expect(config.endpoint).to eq(42)
+    end
+
+    it 'supports nil endpoints' do
+      config.endpoint = nil
+      expect(config.endpoint).to eq(nil)
     end
   end
 
@@ -305,8 +375,8 @@ describe NetSuite::Configuration do
 
   describe '#api_version' do
     context 'when no api_version is defined' do
-      it 'defaults to 2015_1' do
-        expect(config.api_version).to eq('2015_1')
+      it 'defaults to 2016_2' do
+        expect(config.api_version).to eq('2016_2')
       end
     end
   end
@@ -326,15 +396,11 @@ describe NetSuite::Configuration do
 
   describe "#credentials" do
     context "when none are defined" do
-      skip "should properly create the auth credentials" do
-
-      end
+      skip "should properly create the auth credentials"
     end
 
     context "when they are defined" do
-      it "should properly replace the default auth credentials" do
-
-      end
+      skip "should properly replace the default auth credentials"
     end
   end
 
@@ -371,6 +437,65 @@ describe NetSuite::Configuration do
     end
   end
 
+  describe "#log" do
+    it 'allows a file path to be set as the log destination' do
+      file_path = Tempfile.new('tmplog').path
+      config.log = file_path
+      config.logger.info "foo"
+
+      log_contents = open(file_path).read
+      expect(log_contents).to include("foo")
+    end
+
+    it 'allows an IO device to bet set as the log destination' do
+      stream = StringIO.new
+      config.log = stream
+      config.logger.info "foo"
+
+      expect(stream.string).to include("foo")
+    end
+  end
+
+  describe '#log_level' do
+    it 'defaults to :debug' do
+      expect(config.log_level).to eq(:debug)
+    end
+
+    it 'can be initially set to any log level' do
+      config.log_level(:info)
+
+      expect(config.log_level).to eq(:info)
+    end
+
+    it 'can override itself' do
+      config.log_level = :info
+
+      expect(config.log_level).to eq(:info)
+
+      config.log_level(:debug)
+
+      expect(config.log_level).to eq(:debug)
+    end
+  end
+
+  describe '#log_level=' do
+    it 'can set the initial log_level' do
+      config.log_level = :info
+
+      expect(config.log_level).to eq(:info)
+    end
+
+    it 'can override a previously set log level' do
+      config.log_level = :info
+
+      expect(config.log_level).to eq(:info)
+
+      config.log_level = :debug
+
+      expect(config.log_level).to eq(:debug)
+    end
+  end
+
   describe 'timeouts' do
     it 'has defaults' do
       expect(config.read_timeout).to eql(60)
@@ -386,6 +511,27 @@ describe NetSuite::Configuration do
 
       # ensure no exception is raised
       config.connection
+    end
+  end
+
+  describe '#proxy' do
+    it 'defaults to nil' do
+      expect(config.proxy).to be_nil
+    end
+
+    it 'can be set with proxy=' do
+      config.proxy = "https://my-proxy"
+
+      expect(config.proxy).to eql("https://my-proxy")
+
+      # ensure no exception is raised
+      config.connection
+    end
+
+    it 'can be set with proxy(value)' do
+      config.proxy("https://my-proxy")
+
+      expect(config.proxy).to eql("https://my-proxy")
     end
   end
 

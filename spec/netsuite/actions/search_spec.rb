@@ -168,8 +168,30 @@ describe NetSuite::Actions::Search do
 
       expect(search.results.size).to eq(2)
       expect(search.current_page).to eq(1)
+      expect(search.results.first.internal_id).to eq('123')
+      expect(search.results.first.external_id).to eq('456')
       expect(search.results.first.alt_name).to eq('A Awesome Name')
+      expect(search.results.first.custom_field_list.custitem_stringfield.value).to eq('sample string value')
+      expect(search.results.first.custom_field_list.custitem_apcategoryforsales.value.internal_id).to eq('4')
       expect(search.results.last.email).to eq('alessawesome@gmail.com')
+    end
+
+    it "should handle an ID search with basic search only field result columns" do
+      response = File.read('spec/support/fixtures/search/saved_search_item.xml')
+      savon.expects(:search)
+        .with(message: {
+          "searchRecord"=>{
+            "@xsi:type"      =>"listAcct:ItemSearchAdvanced",
+            "@savedSearchId" =>42,
+            :content!        =>{"listAcct:criteria"=>{}},
+          }
+        }).returns(response)
+
+      search = NetSuite::Records::InventoryItem.search(saved: 42)
+
+      expect(search.results.first.location_quantity_available).to eq('3307.0')
+      expect(search.results.first.location_re_order_point).to eq('2565.0')
+      expect(search.results.first.location_quantity_on_order).to eq('40000.0')
     end
   end
 
@@ -179,6 +201,187 @@ describe NetSuite::Actions::Search do
   end
 
   context "basic search" do
+    it "should handle a basic search matching on RecordRef using internalId" do
+      response = File.read('spec/support/fixtures/search/basic_search_contact.xml')
+      savon.expects(:search)
+        .with(message: {
+          "searchRecord" => {
+            :content! => {
+              "listRel:basic" => {
+                "platformCommon:company" => {
+                  "@operator" => "anyOf",
+                  "@xsi:type" => "platformCore:SearchMultiSelectField",
+                  "platformCore:searchValue" => [
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@internalId" => 7497,
+                    },
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@internalId" => 7270,
+                    },
+                  ],
+                },
+              },
+            },
+            "@xsi:type" => "listRel:ContactSearch",
+          },
+        }).returns(response)
+
+      search = NetSuite::Records::Contact.search(
+        basic: [{
+          field: 'company',
+          operator: 'anyOf',
+          value: [
+            NetSuite::Records::RecordRef.new(internal_id: 7497),
+            NetSuite::Records::RecordRef.new(internal_id: 7270),
+          ],
+        }],
+      )
+
+      expect(search.results.size).to eq(1)
+    end
+
+    it "should handle a basic search matching on RecordRef using externalId" do
+      response = File.read('spec/support/fixtures/search/basic_search_contact.xml')
+      savon.expects(:search)
+        .with(message: {
+          "searchRecord" => {
+            :content! => {
+              "listRel:basic" => {
+                "platformCommon:company" => {
+                  "@operator" => "anyOf",
+                  "@xsi:type" => "platformCore:SearchMultiSelectField",
+                  "platformCore:searchValue" => [
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@externalId" => "external_abc",
+                    },
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@externalId" => "external_xyz",
+                    },
+                  ],
+                },
+              },
+            },
+            "@xsi:type" => "listRel:ContactSearch",
+          },
+        }).returns(response)
+
+      search = NetSuite::Records::Contact.search(
+        basic: [{
+          field: 'company',
+          operator: 'anyOf',
+          value: [
+            NetSuite::Records::RecordRef.new(external_id: "external_abc"),
+            NetSuite::Records::RecordRef.new(external_id: "external_xyz"),
+          ],
+        }],
+      )
+
+      expect(search.results.size).to eq(1)
+    end
+
+    it "should handle a basic search matching on RecordRef using mix of internalId and externalId" do
+      response = File.read('spec/support/fixtures/search/basic_search_contact.xml')
+      savon.expects(:search)
+        .with(message: {
+          "searchRecord" => {
+            :content! => {
+              "listRel:basic" => {
+                "platformCommon:company" => {
+                  "@operator" => "anyOf",
+                  "@xsi:type" => "platformCore:SearchMultiSelectField",
+                  "platformCore:searchValue" => [
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@internalId" => 7497,
+                    },
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@externalId" => "external_xyz",
+                    },
+                  ],
+                },
+              },
+            },
+            "@xsi:type" => "listRel:ContactSearch",
+          },
+        }).returns(response)
+
+      search = NetSuite::Records::Contact.search(
+        basic: [{
+          field: 'company',
+          operator: 'anyOf',
+          value: [
+            NetSuite::Records::RecordRef.new(internal_id: 7497),
+            NetSuite::Records::RecordRef.new(external_id: "external_xyz"),
+          ],
+        }],
+      )
+
+      expect(search.results.size).to eq(1)
+    end
+
+    it "should handle a basic search matching on RecordRef using both internalId and externalId" do
+      response = File.read('spec/support/fixtures/search/basic_search_contact.xml')
+      savon.expects(:search)
+        .with(message: {
+          "searchRecord" => {
+            :content! => {
+              "listRel:basic" => {
+                "platformCommon:company" => {
+                  "@operator" => "anyOf",
+                  "@xsi:type" => "platformCore:SearchMultiSelectField",
+                  "platformCore:searchValue" => [
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@internalId" => 7497,
+                      "@externalId" => "external_abc",
+                    },
+                    {
+                      :content! => {},
+                      "@xsi:type" => "platformCore:RecordRef",
+                      "@type" => "account",
+                      "@externalId" => 7270,
+                    },
+                  ],
+                },
+              },
+            },
+            "@xsi:type" => "listRel:ContactSearch",
+          },
+        }).returns(response)
+
+      search = NetSuite::Records::Contact.search(
+        basic: [{
+          field: 'company',
+          operator: 'anyOf',
+          value: [
+            NetSuite::Records::RecordRef.new(internal_id: 7497, external_id: "external_abc"),
+            NetSuite::Records::RecordRef.new(external_id: 7270),
+          ],
+        }],
+      )
+
+      expect(search.results.size).to eq(1)
+    end
+
     skip "should handle searching basic fields"
     skip "should handle searching with joined fields"
   end

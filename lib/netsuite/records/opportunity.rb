@@ -17,7 +17,7 @@ module NetSuite
         :memo, :probability, :proj_alt_sales_amt, :projected_total,
         :range_high, :range_low,
         :ship_is_residential, :source, :status, :sync_partner_teams, :sync_sales_teams,
-        :tax2_total, :tax_total, :title, :total_cost_estimate, :tran_date, :tran_id,
+        :tax2_total, :title, :total_cost_estimate, :tran_date, :tran_id,
         :vat_reg_num, :weighted_total
 
       field :ship_address, ShipAddress
@@ -33,7 +33,6 @@ module NetSuite
 
       attr_reader :internal_id
       attr_accessor :external_id
-      attr_accessor :search_joins
 
       def initialize(attributes = {})
         @internal_id = attributes.delete(:internal_id) || attributes.delete(:@internal_id)
