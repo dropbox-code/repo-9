@@ -18,7 +18,7 @@ require (
 	github.com/golang-queue/nats v0.0.2
 	github.com/golang-queue/nsq v0.0.2
 	github.com/golang-queue/queue v0.0.7
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/json-iterator/go v1.1.12
 	github.com/mattn/go-isatty v0.0.16
 	github.com/mitchellh/mapstructure v1.5.0
