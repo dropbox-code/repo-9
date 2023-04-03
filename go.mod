@@ -59,6 +59,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.12.3 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
