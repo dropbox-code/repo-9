@@ -9343,7 +9343,7 @@ function run() {
             core.info(`Cherry pick into branch ${inputs.branch}!`);
             const githubSha = process.env.GITHUB_SHA;
             const prBranch = inputs.cherryPickBranch
-                ? inputs.cherryPickBranch
+                ? `${inputs.cherryPickBranch}-${githubSha}`
                 : `cherry-pick-${inputs.branch}-${githubSha}`;
             // Configure the committer and author
             core.startGroup('Configuring the committer and author');
@@ -9358,45 +9358,58 @@ function run() {
                 parsedCommitter.email
             ]);
             core.endGroup();
-            // Update  branchs
+            // Update branchs
             core.startGroup('Fetch all branchs');
             yield gitExecution(['remote', 'update']);
             yield gitExecution(['fetch', '--all']);
             core.endGroup();
-            // Create branch new branch
+            // Create new branch
             core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`);
             yield gitExecution(['checkout', '-b', prBranch, `origin/${inputs.branch}`]);
+            yield gitExecution(['commit', '--allow-empty', '-m', 'Empty commit']);
             core.endGroup();
-            // Cherry pick
-            core.startGroup('Cherry picking');
-            const result = yield gitExecution([
-                'cherry-pick',
-                '-m',
-                '1',
-                '--strategy=recursive',
-                '--strategy-option=theirs',
-                `${githubSha}`
-            ]);
-            if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
-                throw new Error(`Unexpected error: ${result.stderr}`);
+            try {
+                // Cherry pick
+                core.startGroup('Cherry picking');
+                const result = yield gitExecution([
+                    'cherry-pick',
+                    '-m',
+                    '1',
+                    '--strategy=recursive',
+                    '--strategy-option=ours',
+                    `${githubSha}`
+                ]);
+                if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
+                    //throw new Error(`Unexpected error: ${result.stderr}`);
+                }
+                core.endGroup();
+            } catch (err) {
+                if (err instanceof Error) {
+                   core.setFailed(err);
+                }
+                // Cherry-pick failed due to a conflict
+                core.info('[DEBUG] Cherry-pick failed due to a conflict.');
+
+                // Add more messages to inputs.body
+                inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
+            } finally {
+                // Push new branch
+                core.startGroup('Push change(s) to remote');
+                if (inputs.force) {
+                    yield gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force']);
+                }
+                else {
+                    yield gitExecution(['push', '-u', 'origin', `${prBranch}`]);
+                }
+                core.endGroup();
+                // Create pull request
+                core.startGroup('Opening pull request');
+                const pull = yield (0, github_helper_1.createPullRequest)(inputs, prBranch);
+                core.setOutput('data', JSON.stringify(pull.data));
+                core.setOutput('number', pull.data.number);
+                core.setOutput('html_url', pull.data.html_url);
+                core.endGroup();
             }
-            core.endGroup();
-            // Push new branch
-            core.startGroup('Push new branch to remote');
-            if (inputs.force) {
-                yield gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force']);
-            }
-            else {
-                yield gitExecution(['push', '-u', 'origin', `${prBranch}`]);
-            }
-            core.endGroup();
-            // Create pull request
-            core.startGroup('Opening pull request');
-            const pull = yield (0, github_helper_1.createPullRequest)(inputs, prBranch);
-            core.setOutput('data', JSON.stringify(pull.data));
-            core.setOutput('number', pull.data.number);
-            core.setOutput('html_url', pull.data.html_url);
-            core.endGroup();
         }
         catch (err) {
             if (err instanceof Error) {
@@ -9670,7 +9683,7 @@ module.exports = require("zlib");
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -9684,7 +9697,7 @@ module.exports = require("zlib");
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -9693,23 +9706,23 @@ module.exports = require("zlib");
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
-/******/ 	
+/******/
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
 /******/ 	module.exports = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;

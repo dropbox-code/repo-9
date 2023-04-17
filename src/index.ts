@@ -52,48 +52,59 @@ export async function run(): Promise<void> {
     ])
     core.endGroup()
 
-    // Update  branchs
+    // Update branchs
     core.startGroup('Fetch all branchs')
     await gitExecution(['remote', 'update'])
     await gitExecution(['fetch', '--all'])
     core.endGroup()
 
-    // Create branch new branch
+    // Create new branch
     core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`)
     await gitExecution(['checkout', '-b', prBranch, `origin/${inputs.branch}`])
     core.endGroup()
 
-    // Cherry pick
-    core.startGroup('Cherry picking')
-    const result = await gitExecution([
-      'cherry-pick',
-      '-m',
-      '1',
-      '--strategy=recursive',
-      '--strategy-option=theirs',
-      `${githubSha}`
-    ])
-    if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
-      throw new Error(`Unexpected error: ${result.stderr}`)
-    }
-    core.endGroup()
+    try {
+        // Cherry pick
+        core.startGroup('Cherry picking')
+        const result = await gitExecution([
+          'cherry-pick',
+          '-m',
+          '1',
+          '--strategy=recursive',
+          '--strategy-option=theirs',
+          `${githubSha}`
+        ])
+        if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
+          throw new Error(`Unexpected error: ${result.stderr}`)
+        }
+        core.endGroup()
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        core.setFailed(err)
+      }
+      // Cherry-pick failed due to a conflict
+      core.info('[DEBUG] Cherry-pick failed due to a conflict.');
 
-    // Push new branch
-    core.startGroup('Push new branch to remote')
-    if (inputs.force) {
-      await gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force'])
-    } else {
-      await gitExecution(['push', '-u', 'origin', `${prBranch}`])
-    }
-    core.endGroup()
+      // Add more messages to inputs.body
+      inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
+    } finally {
+        // Push new branch
+        core.startGroup('Push new branch to remote')
+        if (inputs.force) {
+          await gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force'])
+        } else {
+          await gitExecution(['push', '-u', 'origin', `${prBranch}`])
+        }
+        core.endGroup()
 
-    // Create pull request
-    core.startGroup('Opening pull request')
-    const pull = await createPullRequest(inputs, prBranch)
-    core.setOutput('data', JSON.stringify(pull.data))
-    core.setOutput('number', pull.data.number)
-    core.setOutput('html_url', pull.data.html_url)
-    core.endGroup()
+        // Create pull request
+        core.startGroup('Opening pull request')
+        const pull = await createPullRequest(inputs, prBranch)
+        core.setOutput('data', JSON.stringify(pull.data))
+        core.setOutput('number', pull.data.number)
+        core.setOutput('html_url', pull.data.html_url)
+        core.endGroup()
+    }
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(err)
