@@ -9365,7 +9365,8 @@ function run() {
             core.endGroup();
             // Create new branch
             core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`);
-            yield gitExecution(['checkout', '-b', prBranch, `origin/${inputs.branch}`]);
+            yield gitExecution(['checkout', `origin/${inputs.branch}`]);
+            yield gitExecution(['checkout', '-b', prBranch]);
             yield gitExecution(['commit', '--allow-empty', '-m', 'Empty commit']);
             core.endGroup();
             try {

@@ -60,7 +60,8 @@ export async function run(): Promise<void> {
 
     // Create new branch
     core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`)
-    await gitExecution(['checkout', '-b', prBranch, `origin/${inputs.branch}`])
+    await gitExecution(['checkout', `origin/${inputs.branch}`])
+    await gitExecution(['checkout', '-b', prBranch])
     await gitExecution(['commit', '--allow-empty', '-m', 'Empty commit'])
     core.endGroup()
 
