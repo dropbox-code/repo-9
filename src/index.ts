@@ -98,6 +98,7 @@ export async function run(): Promise<void> {
         await gitExecution(['checkout', 'HEAD', 'gradle.properties']);
         await gitExecution(['add', '.']);
         await gitExecution(['status']);
+        await gitExecution(['commit', '-m', 'Auto bp']);
         //await gitExecution(['cherry-pick', '--continue']);
         core.endGroup()
         // Push new branch

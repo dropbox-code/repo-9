@@ -9402,7 +9402,7 @@ function run() {
                 yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
                 yield gitExecution(['add', '.']);
                 yield gitExecution(['status']);
-                //yield gitExecution(['cherry-pick', '--continue']);
+                yield gitExecution(['commit', '-m', 'Auto bp']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');
