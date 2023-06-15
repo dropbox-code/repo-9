@@ -9374,9 +9374,9 @@ function run() {
                 const result = yield gitExecution([
                     'cherry-pick',
                     '-x',
-                    `${githubSha}`,
-                    '--strategy-option=theirs',
-                    '--allow-empty'
+                    '--no-commit',
+                    '--no-ff',
+                    `${githubSha}`
                 ]);
                 if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
                     //throw new Error(`Unexpected error: ${result.stderr}`);
@@ -9395,8 +9395,8 @@ function run() {
                 // Ignore conflicts in gradle.properties
                 core.startGroup('Ignore conflicts in gradle.properties');
                 yield gitExecution(['checkout', '--ours', 'gradle.properties']);
-                yield gitExecution(['add', 'gradle.properties']);
-                yield gitExecution(['cherry-pick', '--continue', ' || true']);
+                yield gitExecution(['add', '.']);
+                yield gitExecution(['commit', '-m', 'Auto backport commit']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');

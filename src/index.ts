@@ -69,9 +69,9 @@ export async function run(): Promise<void> {
         const result = await gitExecution([
           'cherry-pick',
           '-x',
-          `${githubSha}`,
-          '--strategy-option=theirs',
-          '--allow-empty'
+          '--no-commit',
+          '--no-ff',
+          `${githubSha}`
         ])
         if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
           throw new Error(`Unexpected error: ${result.stderr}`)
@@ -90,8 +90,8 @@ export async function run(): Promise<void> {
         // Ignore conflicts in gradle.properties
         core.startGroup('Ignore conflicts in gradle.properties')
         await gitExecution(['checkout', '--ours', 'gradle.properties']);
-        await gitExecution(['add', 'gradle.properties']);
-        await gitExecution(['cherry-pick', '--continue', ' || true']);
+        await gitExecution(['add', '.']);
+        await gitExecution(['commit', '-m', 'Auto backport commit']);
         core.endGroup()
         // Push new branch
         core.startGroup('Push new branch to remote')
