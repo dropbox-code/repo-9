@@ -9368,32 +9368,51 @@ function run() {
             yield gitExecution(['checkout', '-b', prBranch, `origin/${inputs.branch}`]);
             yield gitExecution(['commit', '--allow-empty', '-m', 'Empty commit']);
             core.endGroup();
+            try {
+                // Cherry pick
+                core.startGroup('Cherry picking');
+                const result = yield gitExecution([
+                    'cherry-pick',
+                    '-n',
+                    `${githubSha}`
+                ]);
+                if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
+                    //throw new Error(`Unexpected error: ${result.stderr}`);
+                }
+                core.endGroup();
+            } catch (err) {
+                if (err instanceof Error) {
+                   core.setFailed(err);
+                }
+                // Cherry-pick failed due to a conflict
+                core.info('[DEBUG] Cherry-pick failed due to a conflict.');
 
-            // Push new branch
-            core.startGroup('Push change(s) to remote');
-            if (inputs.force) {
-                yield gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force']);
+                // Add more messages to inputs.body
+                inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
+            } finally {
+                // Ignore conflicts in gradle.properties
+                core.startGroup('Ignore conflicts in gradle.properties');
+                yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+                yield gitExecution(['status']);
+                yield gitExecution(['cherry-pick', '--continue']);
+                core.endGroup();
+                // Push new branch
+                core.startGroup('Push change(s) to remote');
+                if (inputs.force) {
+                    yield gitExecution(['push', '-u', 'origin', `${prBranch}`, '--force']);
+                }
+                else {
+                    yield gitExecution(['push', '-u', 'origin', `${prBranch}`]);
+                }
+                core.endGroup();
+                // Create pull request
+                core.startGroup('Opening pull request');
+                const pull = yield (0, github_helper_1.createPullRequest)(inputs, prBranch);
+                core.setOutput('data', JSON.stringify(pull.data));
+                core.setOutput('number', pull.data.number);
+                core.setOutput('html_url', pull.data.html_url);
+                core.endGroup();
             }
-            else {
-                yield gitExecution(['push', '-u', 'origin', `${prBranch}`]);
-            }
-            core.endGroup();
-
-            // Create pull request
-            inputs.body += '\nCould you please manually backport your changes to this branch?\n';
-            inputs.body += 'Steps:\n';
-            inputs.body += `1. git checkout manually-cherry-pick-${inputs.branch}-${githubSha} from your local \n`;
-            inputs.body += `2. git cherry-pick -x ${githubSha} \n`;
-            inputs.body += '3. Resolve conflicts if any \n';
-            inputs.body += `4. git push origin manually-cherry-pick-${inputs.branch}-${githubSha} \n`
-
-            core.startGroup('Opening pull request');
-            const pull = yield (0, github_helper_1.createPullRequest)(inputs, prBranch);
-            core.setOutput('data', JSON.stringify(pull.data));
-            core.setOutput('number', pull.data.number);
-            core.setOutput('html_url', pull.data.html_url);
-            core.endGroup();
-
         }
         catch (err) {
             if (err instanceof Error) {
