@@ -9373,9 +9373,7 @@ function run() {
                 core.startGroup('Cherry picking');
                 const result = yield gitExecution([
                     'cherry-pick',
-                    '-x',
-                    '--no-commit',
-                    '--no-ff',
+                    '-n',
                     `${githubSha}`
                 ]);
                 if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
@@ -9394,9 +9392,9 @@ function run() {
             } finally {
                 // Ignore conflicts in gradle.properties
                 core.startGroup('Ignore conflicts in gradle.properties');
-                yield gitExecution(['checkout', '--ours', 'gradle.properties']);
-                yield gitExecution(['add', '.']);
-                yield gitExecution(['commit', '-m', 'Auto backport commit']);
+                yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+                yield gitExecution(['status']);
+                yield gitExecution(['cherry-pick', '--continue']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');
