@@ -9369,6 +9369,12 @@ function run() {
             yield gitExecution(['commit', '--allow-empty', '-m', 'Empty commit']);
             core.endGroup();
             try {
+                // Debug
+                core.startGroup('Check current branch');
+                yield gitExecution(['branch']);
+                yield gitExecution(['log', '-n5', '--oneline']);
+                core.endGroup();
+
                 // Cherry pick
                 core.startGroup('Cherry picking');
                 const result = yield gitExecution([
