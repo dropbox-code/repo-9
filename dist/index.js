@@ -9400,8 +9400,9 @@ function run() {
                 // Ignore conflicts in gradle.properties
                 core.startGroup('Ignore conflicts in gradle.properties');
                 yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+                yield gitExecution(['add', '.']);
                 yield gitExecution(['status']);
-                yield gitExecution(['cherry-pick', '--continue']);
+                //yield gitExecution(['cherry-pick', '--continue']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');

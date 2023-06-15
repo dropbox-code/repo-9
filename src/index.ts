@@ -96,8 +96,9 @@ export async function run(): Promise<void> {
         // Ignore conflicts in gradle.properties
         core.startGroup('Ignore conflicts in gradle.properties')
         await gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+        await gitExecution(['add', '.']);
         await gitExecution(['status']);
-        await gitExecution(['cherry-pick', '--continue']);
+        //await gitExecution(['cherry-pick', '--continue']);
         core.endGroup()
         // Push new branch
         core.startGroup('Push new branch to remote')
