@@ -9375,7 +9375,8 @@ function run() {
                     'cherry-pick',
                     '-x',
                     `${githubSha}`,
-                    '--no-commit'
+                    '--strategy-option=theirs',
+                    '--allow-empty'
                 ]);
                 if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
                     //throw new Error(`Unexpected error: ${result.stderr}`);
@@ -9391,11 +9392,11 @@ function run() {
                 // Add more messages to inputs.body
                 inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
             } finally {
-                // Try to restore gradle.properties
-                core.startGroup('Restore gradle.properties file');
-                yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
-                yield gitExecution(['add', '.']);
-                yield gitExecution(['commit', '-m', "Anything"]);
+                // Ignore conflicts in gradle.properties
+                core.startGroup('Ignore conflicts in gradle.properties');
+                yield gitExecution(['checkout', '--ours', 'gradle.properties']);
+                yield gitExecution(['add', 'gradle.properties']);
+                yield gitExecution(['cherry-pick', '--continue', ' || true']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');
