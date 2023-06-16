@@ -75,8 +75,8 @@ export async function run(): Promise<void> {
         core.startGroup('Cherry picking')
         const result = await gitExecution([
           'cherry-pick',
-          '-n',
-          '--no-ff',
+          '-m',
+          '1`',
           `${githubSha}`
         ])
         if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
