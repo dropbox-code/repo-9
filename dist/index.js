@@ -9379,8 +9379,7 @@ function run() {
                 core.startGroup('Cherry picking');
                 const result = yield gitExecution([
                     'cherry-pick',
-                    '-m',
-                    '1',
+                    '-Xtheirs',
                     `${githubSha}`
                 ]);
                 if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
