@@ -60,8 +60,7 @@ export async function run(): Promise<void> {
 
     // Create new branch
     core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`)
-    await gitExecution(['checkout', `origin/${inputs.branch}`])
-    await gitExecution(['checkout', '-b', prBranch])
+    await gitExecution(['checkout', '-f', '-b', prBranch, `origin/${inputs.branch}`])
     await gitExecution(['commit', '--allow-empty', '-m', 'Empty commit'])
     core.endGroup()
 
@@ -94,11 +93,12 @@ export async function run(): Promise<void> {
       inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
     } finally {
         // Ignore conflicts in gradle.properties
-        core.startGroup('Ignore conflicts in gradle.properties')
+        core.startGroup('Ignore conflicts in gradle.properties and build.gradle files')
         await gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+        await gitExecution(['checkout', 'HEAD', 'build.gradle']);
         await gitExecution(['add', '.']);
         await gitExecution(['status']);
-        await gitExecution(['commit', '-m', 'Auto bp']);
+        await gitExecution(['commit', '-m', 'Auto backport']);
         //await gitExecution(['cherry-pick', '--continue']);
         core.endGroup()
         // Push new branch

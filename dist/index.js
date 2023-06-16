@@ -9365,8 +9365,7 @@ function run() {
             core.endGroup();
             // Create new branch
             core.startGroup(`Create new branch ${prBranch} from ${inputs.branch}`);
-            yield gitExecution(['checkout', `origin/${inputs.branch}`]);
-            yield gitExecution(['checkout', '-b', prBranch]);
+            yield gitExecution(['checkout', '-f', '-b', prBranch, `origin/${inputs.branch}`]);
             yield gitExecution(['commit', '--allow-empty', '-m', 'Empty commit']);
             core.endGroup();
             try {
@@ -9398,11 +9397,12 @@ function run() {
                 inputs.body += '\nOups, cherry-pick failed due to a conflict. Please checkout this branch and try to resolve it by manually.';
             } finally {
                 // Ignore conflicts in gradle.properties
-                core.startGroup('Ignore conflicts in gradle.properties');
+                core.startGroup('Ignore conflicts in gradle.properties and build.gradle files');
                 yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
+                yield gitExecution(['checkout', 'HEAD', 'build.gradle']);
                 yield gitExecution(['add', '.']);
                 yield gitExecution(['status']);
-                yield gitExecution(['commit', '-m', 'Auto bp']);
+                yield gitExecution(['commit', '-m', 'Auto backport']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');
