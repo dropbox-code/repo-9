@@ -76,6 +76,7 @@ export async function run(): Promise<void> {
         const result = await gitExecution([
           'cherry-pick',
           '-n',
+          '--no-ff',
           `${githubSha}`
         ])
         if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
@@ -96,6 +97,8 @@ export async function run(): Promise<void> {
         core.startGroup('Ignore conflicts in gradle.properties and build.gradle files')
         await gitExecution(['checkout', 'HEAD', 'gradle.properties']);
         await gitExecution(['checkout', 'HEAD', 'build.gradle']);
+        await gitExecution(['checkout', 'HEAD', '.circleci/*']);
+        await gitExecution(['checkout', 'HEAD', '.github/*']);
         await gitExecution(['add', '.']);
         await gitExecution(['status']);
         await gitExecution(['commit', '-m', 'Auto backport']);

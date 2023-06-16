@@ -9380,6 +9380,7 @@ function run() {
                 const result = yield gitExecution([
                     'cherry-pick',
                     '-n',
+                    '--no-ff',
                     `${githubSha}`
                 ]);
                 if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
@@ -9400,6 +9401,8 @@ function run() {
                 core.startGroup('Ignore conflicts in gradle.properties and build.gradle files');
                 yield gitExecution(['checkout', 'HEAD', 'gradle.properties']);
                 yield gitExecution(['checkout', 'HEAD', 'build.gradle']);
+                yield gitExecution(['checkout', 'HEAD', '.circleci/*']);
+                yield gitExecution(['checkout', 'HEAD', '.github/*']);
                 yield gitExecution(['add', '.']);
                 yield gitExecution(['status']);
                 yield gitExecution(['commit', '-m', 'Auto backport']);
