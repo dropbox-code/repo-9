@@ -9404,7 +9404,7 @@ function run() {
                 yield gitExecution(['checkout', 'HEAD', '.github/*']);
                 yield gitExecution(['add', '.']);
                 yield gitExecution(['status']);
-                yield gitExecution(['commit', '-m', 'Auto backport']);
+                //yield gitExecution(['commit', '-m', 'Auto backport']);
                 core.endGroup();
                 // Push new branch
                 core.startGroup('Push change(s) to remote');

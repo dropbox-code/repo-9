@@ -100,7 +100,7 @@ export async function run(): Promise<void> {
         await gitExecution(['checkout', 'HEAD', '.github/*']);
         await gitExecution(['add', '.']);
         await gitExecution(['status']);
-        await gitExecution(['commit', '-m', 'Auto backport']);
+        //await gitExecution(['commit', '-m', 'Auto backport']);
         //await gitExecution(['cherry-pick', '--continue']);
         core.endGroup()
         // Push new branch
