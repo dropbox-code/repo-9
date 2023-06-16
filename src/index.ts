@@ -76,7 +76,7 @@ export async function run(): Promise<void> {
         const result = await gitExecution([
           'cherry-pick',
           '-m',
-          '1`',
+          '1',
           `${githubSha}`
         ])
         if (result.exitCode !== 0 && !result.stderr.includes(CHERRYPICK_EMPTY)) {
