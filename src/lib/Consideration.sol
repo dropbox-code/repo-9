@@ -315,7 +315,7 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
         FulfillmentComponent[][] calldata,
         bytes32 fulfillerConduitKey,
         uint256 maximumFulfilled
-    ) public payable virtual returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    ) public payable virtual override returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
         // Convert orders to "advanced" orders and fulfill all available orders.
         return _fulfillAvailableAdvancedOrders(
             _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()), // Convert to advanced orders.
@@ -487,7 +487,7 @@ contract Consideration is ConsiderationInterface, OrderCombiner {
          * @custom:name fulfillments
          */
         Fulfillment[] calldata
-    ) public payable virtual returns (Execution[] memory /* executions */ ) {
+    ) public payable virtual override returns (Execution[] memory /* executions */ ) {
         // Convert to advanced, validate, and match orders using fulfillments.
         return _matchAdvancedOrders(
             _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()),
