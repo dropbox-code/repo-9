@@ -9,6 +9,8 @@ import (
 	"os"
 	"sync"
 
+	"github.com/trustwallet/go-libs/middleware"
+
 	"github.com/appleboy/gorush/config"
 	"github.com/appleboy/gorush/core"
 	"github.com/appleboy/gorush/logx"
@@ -206,6 +208,8 @@ func routerEngine(cfg *config.ConfYaml, q *queue.Queue) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(VersionMiddleware())
 	r.Use(StatMiddleware())
+
+	r.Use(middleware.MetricsMiddleware("gorush", nil, prometheus.DefaultRegisterer))
 
 	r.GET(cfg.API.StatGoURI, api.GinHandler)
 	r.GET(cfg.API.StatAppURI, appStatusHandler(q))
