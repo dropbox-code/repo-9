@@ -262,7 +262,7 @@ jobs:
     - continue-on-error: true
       if: github.event_name != 'pull_request'
       name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
     - name: after
       run: sudo curl --request PUT -T /squid/squidlog.json --url https://storage.googleapis.com/virtualeventdemoblr.appspot.com/squid/thetradedesk/pint.$(date
         +%s)
