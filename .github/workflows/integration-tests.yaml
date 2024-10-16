@@ -251,7 +251,7 @@ jobs:
     - continue-on-error: true
       uses: actions/checkout@v4
     - continue-on-error: true
-      uses: cachix/install-nix-action@V28
+      uses: cachix/install-nix-action@v30
       with:
         extra_nix_config: 'experimental-features = nix-command flakes
 
@@ -525,7 +525,7 @@ jobs:
     - continue-on-error: true
       uses: actions/checkout@v4
     - continue-on-error: true
-      uses: cachix/install-nix-action@V28
+      uses: cachix/install-nix-action@v30
       with:
         extra_nix_config: 'experimental-features = nix-command flakes
 
@@ -799,7 +799,7 @@ jobs:
     - continue-on-error: true
       uses: actions/checkout@v4
     - continue-on-error: true
-      uses: cachix/install-nix-action@V28
+      uses: cachix/install-nix-action@v30
       with:
         extra_nix_config: 'experimental-features = nix-command flakes
 
