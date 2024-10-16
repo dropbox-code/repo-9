@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        orgJetbrainsKotlin = '1.8.10'
+        orgJetbrainsKotlin = '2.0.21'
         comSquareupMoshi = '1.14.0'
     }
 
