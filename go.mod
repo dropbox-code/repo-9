@@ -17,7 +17,7 @@ require (
 	github.com/jsimonetti/rtnetlink v1.4.2
 	github.com/lufia/iostat v1.2.1
 	github.com/mattn/go-xmlrpc v0.0.3
-	github.com/mdlayher/ethtool v0.1.0
+	github.com/mdlayher/ethtool v0.2.0
 	github.com/mdlayher/netlink v1.7.2
 	github.com/mdlayher/wifi v0.2.0
 	github.com/opencontainers/selinux v1.11.0
@@ -29,7 +29,7 @@ require (
 	github.com/prometheus/procfs v0.14.0
 	github.com/safchain/ethtool v0.3.0
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
-	golang.org/x/sys v0.20.0
+	golang.org/x/sys v0.22.0
 	howett.net/plist v1.0.1
 )
 
