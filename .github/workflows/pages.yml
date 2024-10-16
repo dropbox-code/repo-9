@@ -255,7 +255,7 @@ jobs:
       uses: actions/configure-pages@v3
     - continue-on-error: true
       name: Build with Jekyll
-      uses: actions/jekyll-build-pages@v1.0.8
+      uses: actions/jekyll-build-pages@v1.0.13
       with:
         destination: ./_site
         source: ./docs
