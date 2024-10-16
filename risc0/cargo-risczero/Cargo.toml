@@ -37,7 +37,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 zip = { version = "0.6", optional = true }
 
 [build-dependencies]
-env_logger = { version = "0.10", optional = true }
+env_logger = { version = "0.11", optional = true }
 risc0-build = { workspace = true, optional = true }
 zip = { version = "0.6", optional = true }
 
