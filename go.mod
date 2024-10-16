@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/fatih/color v1.15.0
-	github.com/gkampitakis/go-snaps v0.4.8
+	github.com/gkampitakis/go-snaps v0.5.7
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v50 v50.2.0
 	github.com/hashicorp/hcl/v2 v2.17.0
@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/common v0.44.0
 	github.com/prometheus/prometheus v0.46.0
 	github.com/prymitive/current v0.1.0
-	github.com/rogpeppe/go-internal v1.11.0
+	github.com/rogpeppe/go-internal v1.12.0
 	github.com/rs/zerolog v1.30.0
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
@@ -45,7 +45,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
-	github.com/gkampitakis/ciinfo v0.2.4 // indirect
+	github.com/gkampitakis/ciinfo v0.3.0 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
@@ -64,6 +64,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/maruel/natural v1.1.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
@@ -79,7 +80,7 @@ require (
 	github.com/prometheus/procfs v0.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
