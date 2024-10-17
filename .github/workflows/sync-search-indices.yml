@@ -269,7 +269,7 @@ jobs:
       run: npm ci
     - continue-on-error: true
       name: Cache nextjs build
-      uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
+      uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8
       with:
         key: ${{ runner.os }}-nextjs-${{ hashFiles('package*.json') }}
         path: .next/cache
