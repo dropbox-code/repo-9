@@ -50,7 +50,7 @@ ARG CONTAINERIZED_SYSTEMD_VERSION=v0.1.1
 ARG GOTESTSUM_VERSION=v1.10.0
 ARG NYDUS_VERSION=v2.2.1
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.2.1 AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.5.0 AS xx
 
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-bullseye AS build-base-debian
