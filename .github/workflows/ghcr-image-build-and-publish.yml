@@ -269,7 +269,7 @@ jobs:
     - continue-on-error: true
       id: meta
       name: Extract Docker metadata
-      uses: docker/metadata-action@v4.4.0
+      uses: docker/metadata-action@v5.5.1
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     - continue-on-error: true
