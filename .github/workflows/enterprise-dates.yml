@@ -277,7 +277,7 @@ jobs:
         HUSKY: '0'
       id: create-pull-request
       name: Create pull request
-      uses: peter-evans/create-pull-request@bd72e1b7922d417764d27d30768117ad7da78a0e
+      uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f
       with:
         body: "Hello! The GitHub Enterprise Server release dates have changed.\n\n\
           \ If CI passes, this PR will be auto-merged. :green_heart:\n\n If CI does\

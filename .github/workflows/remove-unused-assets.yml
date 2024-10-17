@@ -283,7 +283,7 @@ jobs:
       env:
         HUSKY: '0'
       name: Create pull request
-      uses: peter-evans/create-pull-request@bd72e1b7922d417764d27d30768117ad7da78a0e
+      uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f
       with:
         body: "Hello! This PR removes some files that exist in the repo but are not\
           \ used in content or data files:\n\n ${{ steps.results.outputs.content }}\
